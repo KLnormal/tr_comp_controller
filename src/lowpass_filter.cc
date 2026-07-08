@@ -5,32 +5,32 @@
 #include "filter/lowpass_filter.h"
 #include "dsp/fast_math_functions.h"
 
-using namespace Filter;
+using namespace filter;
 
 /**
  *
  * @param cut_frequency 截止频率（-3dB增益点）
  * @param sample_frec 采样频率
  */
-LowPassFilter::LowPassFilter(float cut_frequency, float sampling_frequency)
+low_pass_filter::low_pass_filter(float cut_frequency, float sampling_frequency)
 	:cut_frequency_(cut_frequency), sampling_frequency_(sampling_frequency) {
 	filter_coe_ = 1/(1+sampling_frequency/(2*PI*cut_frequency));
 }
 
-void LowPassFilter::clear()
+void low_pass_filter::clear()
 {
 	last_out_ = 0;
 	current_out_ = 0;
 }
 
-void LowPassFilter::set_params(float cut_frequency, float sampling_frequency)
+void low_pass_filter::set_params(float cut_frequency, float sampling_frequency)
 {
 	cut_frequency_ = cut_frequency;
 	sampling_frequency_ = sampling_frequency;
 	filter_coe_ = 1/(1+sampling_frequency/(2*PI*cut_frequency));
 }
 
-float LowPassFilter::update(float sample)
+float low_pass_filter::update(float sample)
 {
 	last_out_ = current_out_;
 	current_out_ = (1-filter_coe_)*last_out_ + filter_coe_*sample;

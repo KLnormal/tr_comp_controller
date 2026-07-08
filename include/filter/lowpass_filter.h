@@ -5,13 +5,13 @@
 #ifndef TROBOT_FILTER_H
 #define TROBOT_FILTER_H
 
-namespace  Filter
+namespace filter
 {
-	class LowPassFilter
+	class low_pass_filter
 	{
 	public:
-		LowPassFilter() = default;
-		LowPassFilter(float cut_frequency, float sampling_frequency);
+		low_pass_filter() = default;
+		low_pass_filter(float cut_frequency, float sampling_frequency);
 		void clear();
 		void set_params(float cut_frequency, float sampling_frequency);
 		float update(float sample);
