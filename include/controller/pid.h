@@ -10,13 +10,18 @@
 
 namespace controller {
     class pid {
-        typedef struct { float kp, ki, kd, int_limit, out_limit; } pid_para_t;
     public:
+        typedef struct { float kp, ki, kd, int_limit, out_limit; } pid_para_t;
         pid() = default;
         ~pid() = default;
 
         void clear() {
             err = lst_err = p_out = i_out = d_out = out = 0;
+        }
+
+        void init(const pid_para_t &para) {
+            para_ = para;
+            clear();
         }
 
         void init(const float &kp, const float &ki, const float &kd, const float &int_limit, const float &out_limit) {
@@ -26,6 +31,10 @@ namespace controller {
             para_.int_limit = int_limit;
             para_.out_limit = out_limit;
             clear();
+        }
+
+        explicit pid(const pid_para_t &para) {
+            init(para);
         }
 
         pid(const float &kp, const float &ki, const float &kd, const float &int_limit, const float &out_limit) {
