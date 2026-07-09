@@ -2,13 +2,10 @@
 // Created by 15082 on 2026/6/1.
 //
 
-#ifndef TROBOT_FILTER_H
-#define TROBOT_FILTER_H
+#pragma once
 
-namespace filter
-{
-	class low_pass_filter
-	{
+namespace filter {
+	class low_pass_filter {
 	public:
 		low_pass_filter() = default;
 		low_pass_filter(float cut_frequency, float sampling_frequency);
@@ -21,5 +18,3 @@ namespace filter
 		float filter_coe_ = 0;
 	};
 };
-
-#endif //TROBOT_FILTER_H
