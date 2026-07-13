@@ -48,15 +48,19 @@ namespace controller {
             init(kp, ki, kd, int_limit, out_limit);
         }
 
-        float update(const float &current, const float &target) {
-            if (!std::isfinite(current) || !std::isfinite(target)) {
+        /// @param current 当前值
+        /// @param target  目标值
+        /// @param dt      时间步长（秒），默认 1.0 保持与旧代码兼容。
+        ///                若显式传 dt，ki/kd 应配置为「每秒」增益。
+        float update(const float &current, const float &target, float dt = 1.0f) {
+            if (!std::isfinite(current) || !std::isfinite(target) || !std::isfinite(dt) || dt <= 0.0f) {
                 clear();
                 return 0.0f;
             }
             lst_err = err, err = target - current;
             p_out = para_.kp * err;
-            i_out += para_.ki * err;
-            d_out = para_.kd * (err - lst_err);
+            i_out += para_.ki * err * dt;
+            d_out = para_.kd * (err - lst_err) / dt;
             i_out = std::clamp(i_out, -para_.int_limit, para_.int_limit);
             out = p_out + i_out + d_out;
             out = std::clamp(out, -para_.out_limit, para_.out_limit);
