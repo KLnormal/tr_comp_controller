@@ -7,6 +7,9 @@
 #pragma once
 
 #include <algorithm>
+#include <cmath>
+
+#include "bsp/def.h"
 
 namespace controller {
     class pid {
@@ -20,17 +23,21 @@ namespace controller {
         }
 
         void init(const pid_para_t &para) {
+            BSP_ASSERT(std::isfinite(para.kp) && std::isfinite(para.ki) && std::isfinite(para.kd) &&
+                std::isfinite(para.int_limit) && std::isfinite(para.out_limit) &&
+                para.int_limit >= 0 && para.out_limit >= 0);
             para_ = para;
             clear();
         }
 
         void init(const float &kp, const float &ki, const float &kd, const float &int_limit, const float &out_limit) {
-            para_.kp = kp;
-            para_.ki = ki;
-            para_.kd = kd;
-            para_.int_limit = int_limit;
-            para_.out_limit = out_limit;
-            clear();
+            init(pid_para_t {
+                .kp = kp,
+                .ki = ki,
+                .kd = kd,
+                .int_limit = int_limit,
+                .out_limit = out_limit
+            });
         }
 
         explicit pid(const pid_para_t &para) {
@@ -42,6 +49,10 @@ namespace controller {
         }
 
         float update(const float &current, const float &target) {
+            if (!std::isfinite(current) || !std::isfinite(target)) {
+                clear();
+                return 0.0f;
+            }
             lst_err = err, err = target - current;
             p_out = para_.kp * err;
             i_out += para_.ki * err;

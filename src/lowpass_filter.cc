@@ -3,18 +3,20 @@
 //
 
 #include "filter/lowpass_filter.h"
+#include "bsp/def.h"
 #include "dsp/fast_math_functions.h"
+
+#include <cmath>
 
 using namespace filter;
 
 /**
  * @brief 低通滤波器
  * @param cut_frequency 截止频率（-3dB增益点）
- * @param sample_frec 采样频率
+ * @param sampling_frequency 采样频率
  */
-low_pass_filter::low_pass_filter(float cut_frequency, float sampling_frequency)
-	:cut_frequency_(cut_frequency), sampling_frequency_(sampling_frequency) {
-	filter_coe_ = 1/(1+sampling_frequency/(2*PI*cut_frequency));
+low_pass_filter::low_pass_filter(float cut_frequency, float sampling_frequency) {
+	set_params(cut_frequency, sampling_frequency);
 }
 
 void low_pass_filter::clear() {
@@ -23,6 +25,8 @@ void low_pass_filter::clear() {
 }
 
 void low_pass_filter::set_params(float cut_frequency, float sampling_frequency) {
+	if (!std::isfinite(cut_frequency) || !std::isfinite(sampling_frequency) ||
+		cut_frequency <= 0 || sampling_frequency <= 0) return;
 	cut_frequency_ = cut_frequency;
 	sampling_frequency_ = sampling_frequency;
 	filter_coe_ = 1/(1+sampling_frequency/(2*PI*cut_frequency));
