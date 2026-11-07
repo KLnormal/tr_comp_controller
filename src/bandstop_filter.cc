@@ -8,15 +8,11 @@ band_stop_filter::band_stop_filter(float low_frequency, float high_frequency, fl
     set_params(low_frequency, high_frequency, sampling_frequency);
 }
 
-bool band_stop_filter::set_params(float low_frequency, float high_frequency, float sampling_frequency) {
-    if(!std::isfinite(low_frequency) || !std::isfinite(high_frequency) ||
-       !std::isfinite(sampling_frequency) || sampling_frequency <= 0 ||
-       low_frequency <= 0 || low_frequency >= high_frequency ||
-       high_frequency >= 0.5 * sampling_frequency) return false;
+void band_stop_filter::set_params(float low_frequency, float high_frequency, float sampling_frequency) {
     const double low = std::tan(std::numbers::pi * low_frequency / sampling_frequency);
     const double high = std::tan(std::numbers::pi * high_frequency / sampling_frequency);
     const double bandwidth = high - low;
     const double center2 = low * high;
-    return set_coefficients(1 + center2, 2 * (center2 - 1), 1 + center2,
+    set_coefficients(1 + center2, 2 * (center2 - 1), 1 + center2,
                      1 + bandwidth + center2, 2 * (center2 - 1), 1 - bandwidth + center2);
 }
