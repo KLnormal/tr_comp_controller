@@ -1,0 +1,18 @@
+#include "filter/bandstop_filter.h"
+#include <cmath>
+#include <numbers>
+
+using namespace filter;
+
+band_stop_filter::band_stop_filter(float low_frequency, float high_frequency, float sampling_frequency) {
+    set_params(low_frequency, high_frequency, sampling_frequency);
+}
+
+void band_stop_filter::set_params(float low_frequency, float high_frequency, float sampling_frequency) {
+    const double low = std::tan(std::numbers::pi * low_frequency / sampling_frequency);
+    const double high = std::tan(std::numbers::pi * high_frequency / sampling_frequency);
+    const double bandwidth = high - low;
+    const double center2 = low * high;
+    set_coefficients(1 + center2, 2 * (center2 - 1), 1 + center2,
+                     1 + bandwidth + center2, 2 * (center2 - 1), 1 - bandwidth + center2);
+}
