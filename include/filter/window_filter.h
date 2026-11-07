@@ -2,6 +2,8 @@
 #include <algorithm>
 #include <array>
 #include <cstddef>
+#include <cmath>
+#include <limits>
 #include <numeric>
 
 namespace filter {
@@ -31,10 +33,13 @@ struct sample_window {
 }
 
 // N 是样本数，窗口未满时仅使用已收到的样本。
+// 三类窗口滤波器均拒绝非有限样本：返回 NaN，窗口及累计和不变。
+// 中值及截尾均值每次更新使用 O(N log N) 排序、O(N) 临时存储。
 template<std::size_t N>
 class moving_average_filter {
 public:
     float update(float sample) {
+        if(!std::isfinite(sample)) return std::numeric_limits<float>::quiet_NaN();
         sum_ += static_cast<double>(sample) - window_.push(sample);
         return static_cast<float>(sum_ / window_.count);
     }
@@ -50,11 +55,12 @@ template<std::size_t N>
 class median_filter {
 public:
     float update(float sample) {
+        if(!std::isfinite(sample)) return std::numeric_limits<float>::quiet_NaN();
         window_.push(sample);
         const auto values = window_.sorted();
         const std::size_t middle = window_.count / 2;
         if(window_.count % 2) return values[middle];
-        return (values[middle - 1] + values[middle]) * 0.5f;
+        return static_cast<float>((static_cast<double>(values[middle - 1]) + values[middle]) * 0.5);
     }
 
     void clear() { window_.clear(); }
@@ -69,6 +75,7 @@ class trimmed_mean_filter {
     static_assert(2 * Trim < N);
 public:
     float update(float sample) {
+        if(!std::isfinite(sample)) return std::numeric_limits<float>::quiet_NaN();
         window_.push(sample);
         const auto values = window_.sorted();
         const std::size_t trim = window_.count > 2 * Trim ? Trim : 0;
