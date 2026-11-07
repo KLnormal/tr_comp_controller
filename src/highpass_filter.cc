@@ -15,5 +15,6 @@ bool high_pass_filter::set_params(float cut_frequency, float sampling_frequency)
     const double k = std::tan(std::numbers::pi * cut_frequency / sampling_frequency);
     const double k2 = k * k;
     const double damping = std::numbers::sqrt2 * k;
-    return set_coefficients(1, -2, 1, 1 + damping + k2, 2 * (k2 - 1), 1 - damping + k2);
+    return set_coefficients(1, -2, 1, 1 + damping + k2, 2 * (k2 - 1), 1 - damping + k2,
+                            {{0, 0}, {2 * std::atan(k), std::numbers::sqrt2 / 2}, {std::numbers::pi, 1}});
 }
